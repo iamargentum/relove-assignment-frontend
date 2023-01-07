@@ -9,6 +9,7 @@ export function MathApp() {
     const [mySid, setMySid] = useState()
     const [answer, setAnswer] = useState()
     const [question, setQuestion] = useState()
+    const [winnerName, setWinnerName] = useState()
     const [usersPlaying, setUsersPlaying] = useState([])
     const [isConnected, setIsConnected] = useState(false)
     const [userIsReady, setUserIsReady] = useState(false)
@@ -50,6 +51,19 @@ export function MathApp() {
             console.log("new question received ", q);
         })
 
+        socket.on("winner", (w) => {
+            setQuestion(undefined)
+            setWinnerName(w.name)
+            setUserIsReady(false)
+            setUsersPlaying(prev => {
+                const temp = prev.map((p, _index) => {
+                    p.ready = 0
+                    return p
+                })
+                return [...temp]
+            })
+        })
+
         return () => {
             socket.off("connect")
             socket.off("disconnect")
@@ -58,6 +72,14 @@ export function MathApp() {
 
     return (
         <div className="flex flex-col">
+
+            {
+                winnerName && (
+                    <p>
+                        Winner of previous game is {winnerName}
+                    </p>
+                )
+            }
 
             {
                 !nameSubmitted && (
