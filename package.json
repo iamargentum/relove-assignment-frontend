@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "env-cmd -f .env.production vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.13",
+    "env-cmd": "^10.1.0",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
+    "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.6.1",
