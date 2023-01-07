@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
 
-const socket = io("http://localhost:5000")
+const socket = io(import.meta.env.VITE_SOCKETIO_SERVER_URL)
 
 export function MathApp() {
 
@@ -154,10 +154,10 @@ export function MathApp() {
         }
         {
             !isConnected && (
-                <>
+                <div className="mx-auto">
                     <p>Hmm...</p>
                     <p>Seems like there's some problem</p>
-                </>
+                </div>
             )
         }
         </>
