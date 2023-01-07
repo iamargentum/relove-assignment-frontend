@@ -16,11 +16,15 @@ export function MathApp() {
     const [nameSubmitted, setNameSubmitted] = useState(false)
 
     function handleSubmit() {
-        // make an api call to submit the answer
+        socket.emit("submitAnswer", {
+            answer: answer,
+            time: Date.now()
+        })
     }
 
     useEffect(() => {
         socket.on("connect", () => {
+            setMySid(socket.id)
             setIsConnected(true)
             console.log("connected to websocket server");
         })
@@ -30,7 +34,7 @@ export function MathApp() {
         })
 
         socket.on("updateUsersList", (data) => {
-            console.log("data is ", data);
+            setUsersPlaying([...data])
         })
 
         socket.on("userSubmitted", (user) => {
@@ -41,8 +45,9 @@ export function MathApp() {
         })
 
         socket.on("newQuestion", (q) => {
-            setQuestion(q)
+            setQuestion({...q})
             setSubmittedUsers([])
+            console.log("new question received ", q);
         })
 
         return () => {
@@ -92,17 +97,38 @@ export function MathApp() {
             {
                 nameSubmitted && userIsReady &&(
                     <>
-                    <div className="flex flex-row"></div>
                     <div className="flex flex-col">
-                        <input
-                            type="number"
-                            onChange={(e) => setAnswer(e.target.value)}
-                        />
-                        <button
-                            onClick={handleSubmit}
-                        >
-                            Submit
-                        </button>
+                        {
+                            question !== undefined && usersPlaying.filter(u => u.ready === 1).length === usersPlaying.length && (
+                                <div className="flex flex-row">
+                                    <p>{question.operands.first} {question.operation} {question.operands.second}</p>
+                                    <input
+                                        type="number"
+                                        onChange={(e) => setAnswer(e.target.value)}
+                                    />
+                                    <button
+                                        onClick={handleSubmit}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            )
+                        }
+                        {
+                            usersPlaying && usersPlaying.length && (
+                                <div>
+                                    {
+                                        usersPlaying.filter(u => u.sid != mySid).map((user, userIndex) => {
+                                            return (
+                                                <p key={`user_playing_${userIndex}`} className={"p-2 rounded-md " + user.ready ? "bg-yellow-100" : "bg-green-100"}>
+                                                    { user.name }
+                                                </p>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            )
+                        }
                     </div>
                     </>
                 )
